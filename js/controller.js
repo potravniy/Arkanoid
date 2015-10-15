@@ -1,5 +1,5 @@
-﻿define(["./main", "./renderField", "./Circle", "./Surprise", "./Brick1", "./Brick2", "./Brick3", "./Slider", "./level1", "./level2", "./level3", "./level4", "./level5", "./level6"]
-    , function (main, renderField, Cicle, Surprise, Brick1, Brick2, Brick3, Slider, level1, level2, level3, level4, level5, level6) {
+﻿define(["./main", "./renderField", "./Circle", "./Slider", "./Surprise", "./Brick1", "./Brick2", "./Brick3", "./Brick4", "./levels"]
+    , function (main, renderField, Cicle, Slider, Surprise, Brick1, Brick2, Brick3, Brick4, levels) {
     return function () {
         level = 1;
         var slider = new Slider();
@@ -11,8 +11,8 @@
         var brickWigth = Math.round(inboxViewWidth / bricksInRow);
         var bricksInColumn = 12;
         var bricksHeight = Math.round(inboxViewHeight * 0.6 / bricksInColumn);
-        var bricks = level1;
-        var countBricks = 0;
+        var bricks = levels[1];
+        var countDesroyableBricks = 0;
         var powerTimeTimeoutID;
         var powerTime = 20000;   //  ms
         var surpriseFound = false;
@@ -34,14 +34,16 @@
             for (var i = 0; i < bricks.length; i++) {
                 for (var j = 0; j < bricks[i].length; j++) {
                     if (bricks[i][j] === 1) {
-                        bricks[i][j] = new Brick1(borderLineWidth + j * brickWigth, i * bricksHeight, brickWigth, bricksHeight);
-                        countBricks++;
+                        bricks[i][j] = new Brick1(borderLineWidth + j * brickWigth, borderLineWidth + i * bricksHeight, brickWigth, bricksHeight);
+                        countDesroyableBricks++;
                     } else if (bricks[i][j] === 2) {
-                        bricks[i][j] = new Brick2(borderLineWidth + j * brickWigth, i * bricksHeight, brickWigth, bricksHeight);
-                        countBricks++;
+                        bricks[i][j] = new Brick2(borderLineWidth + j * brickWigth, borderLineWidth + i * bricksHeight, brickWigth, bricksHeight);
+                        countDesroyableBricks++;
                     } else if (bricks[i][j] === 3) {
-                        bricks[i][j] = new Brick3(borderLineWidth + j * brickWigth, i * bricksHeight, brickWigth, bricksHeight);
-                        countBricks++;
+                        bricks[i][j] = new Brick3(borderLineWidth + j * brickWigth, borderLineWidth + i * bricksHeight, brickWigth, bricksHeight);
+                        countDesroyableBricks++;
+                    } else if (bricks[i][j] === 4) {
+                        bricks[i][j] = new Brick4(borderLineWidth + j * brickWigth, borderLineWidth + i * bricksHeight, brickWigth, bricksHeight);
                     }
                 }
             }
@@ -130,11 +132,9 @@
             }
         }
         function collisionWithBricks() {
-            countBricks = 0;
             for (var i = 0; i < bricks.length; i++) {
                 for (var j = 0; j < bricks[i].length; j++) {
                     if (bricks[i][j]) {
-                        countBricks++;
                         var b = bricks[i][j];
                         var dist = Math.sqrt((circle.x - b.centrX) * (circle.x - b.centrX) + (circle.y - b.centrY) * (circle.y - b.centrY));
                         var destroyed = false;
@@ -202,6 +202,7 @@
                         }
                         if (destroyed) {
                             bricks[i][j] = undefined;
+                            countDesroyableBricks--;
                             score++;
                         }
                         if (surpriseFound) {
@@ -211,7 +212,7 @@
                     }
                 }
             }
-            if (countBricks == 0) {
+            if (countDesroyableBricks == 0) {
                 levelCompleted();
             }
         }
@@ -299,6 +300,7 @@
             surprise = [];
             slider.loosing();
             clearInterval(intervalID);
+            if (powerTimeTimeoutID) clearTimeout(powerTimeTimeoutID);
             lifes--;
             if (lifes < 0) {
                 lifes = "X"
@@ -318,8 +320,8 @@
             surprise = [];
             clearInterval(intervalID);
             runRender = false;
-            $can.addEventListener("click", nextLevel);
-            if (level !== 6) {
+            if (level < levels.length - 1) {
+                $can.addEventListener("click", nextLevel);
                 setTimeout(function () {
                     startTime = undefined;
                     ctx.fillStyle = "goldenrod";
@@ -336,17 +338,7 @@
         function nextLevel() {
             $can.removeEventListener("click", nextLevel);
             level++;
-            if (level === 2) {
-                bricks = level2;
-            } else if (level === 3 && !!level3) {
-                bricks = level3;
-            } else if (level === 4 && !!level4) {
-                bricks = level4;
-            } else if (level === 5 && !!level5) {
-                bricks = level5;
-            } else if (level === 6 && !!level6) {
-                bricks = level6;
-            }
+            bricks = levels[level];
             $can.addEventListener("click", go);
             creareBrickField();
             slider.reset();

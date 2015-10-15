@@ -51,7 +51,7 @@
             ctx.textAlign = "center";
             ctx.textBaseline = 'middle';
             ctx.strokeStyle = gradient;
-            ctx.strokeText(that.value, that.x, that.y, that.width);
+            ctx.fillText(that.value, that.x, that.y, that.width);
         }
     }
 })

@@ -11,6 +11,7 @@ define(["./main"], function(main){
             that.y = Math.round(slider.y - slider.height - that.r);
             that.vX = vX;			//	px/sec
             that.vY = vY;			//	px/sec
+            that.power = false;
             startFollowingSlider();
         }
         this.reset();
@@ -23,9 +24,9 @@ define(["./main"], function(main){
             clearPreviousBall();
             ctx.beginPath();
             var gradient = ctx.createRadialGradient(this.x, this.y, this.r, this.x - 0.3 * this.r, this.y - 0.3 * this.r, 0);
-            gradient.addColorStop(0, that.darkColor);
-            if (that.power) gradient.addColorStop(1, "#f00");
-            else gradient.addColorStop(1, that.lightColor);
+            if (that.power) gradient.addColorStop(0, "#f00");
+            else gradient.addColorStop(0, that.darkColor);
+            gradient.addColorStop(1, that.lightColor);
             ctx.fillStyle = gradient;
             ctx.arc(that.x, that.y, that.r, 0, 2 * Math.PI, true);
             ctx.closePath();
@@ -34,7 +35,6 @@ define(["./main"], function(main){
                 ctx.shadowOffsetX = -that.vX / Math.sqrt(that.vX * that.vX + that.vY * that.vY);
                 ctx.shadowOffsetY = -that.vY / Math.sqrt(that.vX * that.vX + that.vY * that.vY);
                 ctx.shadowBlur = that.r / 2;
-
             }
             ctx.fill();
             ctx.shadowOffsetX = 0;
